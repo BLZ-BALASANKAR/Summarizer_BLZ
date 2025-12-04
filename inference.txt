@@ -1,0 +1,46 @@
+GEMINI ANALYSIS
+================================================================================
+
+Metric interpretations:
+Compression %: Text reduction; lower is more concise.
+Density %: Info per word; higher is richer.
+Cosine Similarity: Semantic match to original; higher is better.
+Time (s): Generation speed; lower is faster.
+
+Performance rankings:
+Extractive: Sumy Textrank (0.9425) leads quality. Custom Textrank/Sumy Lexrank (0.031s) are fastest.
+Abstractive: Flan T5 Base (0.924) leads quality. T5 (11.512s) is fastest.
+Best speed: Custom Textrank, Sumy Lexrank.
+Best quality: Sumy Textrank (extractive), Flan T5 Base (abstractive).
+Best balance: Tfidf, Custom Textrank.
+
+Red flags & issues:
+Pegasus Xsum: Very low Cosine Sim (0.5229), low Density, extremely slow (97.039s). Indicates poor quality, potential hallucinations.
+Semantic Textrank: Slow (5.977s) for extractive. Abstractive models are very slow.
+
+Practical recommendations:
+Speed-critical: Custom Textrank, Sumy Lexrank.
+Quality-critical: Sumy Textrank (extractive), Flan T5 Base (abstractive, if speed allows).
+Balanced: Tfidf, Custom Textrank.
+Avoid: Pegasus Xsum.
+
+Trade-offs:
+Speed vs Quality: Faster extractive models offer good quality. Slower abstractive models can achieve higher quality but at significant time cost.
+Extractive vs Abstractive: Extractive is faster, more faithful (use for faithfulness). Abstractive generates novel sentences, potentially higher compression/density, but slower and riskier (use for rephrasing).
+
+EXCEL DATA (NUMERIC TABLE)
+================================================================================
+
+     Method/Model        Type  Word Count  Time (s)  Compression %  Density %  Cosine Sim
+            Tfidf  Extractive         201     0.048          42.58      49.31      0.9267
+  Custom Textrank  Extractive         201     0.031          42.58      49.31      0.9267
+    Sumy Textrank  Extractive         226     0.053          47.88      48.98      0.9425
+     Sumy Lexrank  Extractive         151     0.031          31.99      55.15      0.9049
+         Sumy Lsa  Extractive         141     0.052          29.87      61.94      0.8818
+Semantic Textrank  Extractive         105     5.977          22.25      64.29      0.8489
+Embedding Lexrank  Extractive         105     0.554          22.25      64.29      0.8489
+              Mmr  Extractive          94     0.536          19.92      71.43      0.8222
+             Bart Abstractive          84    63.400          17.80      68.89      0.8437
+               T5 Abstractive          76    11.512          16.10      72.15      0.7971
+     Pegasus Xsum Abstractive         111    97.039          23.52      14.19      0.5229
+     Flan T5 Base Abstractive         181    77.312          38.35      56.35      0.9240
