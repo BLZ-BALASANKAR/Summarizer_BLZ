@@ -1,51 +1,17 @@
-============================================================
-[Page 1]
-============================================================
+Global warming refers to the increase in the planet’s overall average temperature in recent decades. Natural processes have always affected Earth’s temperature and climate, but more recently, the planet’s temperature and climate have changed at a higher pace than nature alone can explain. These rapid changes are due to human activities and the widespread use of fossil fuels for energy.
 
-28 AIRLIFT    
-14.1 Should the  BUYER  intend  to airlift  all or some  of the stores  the SELLER  shall  pack  
-the stores accordingly on  receipt  of intimation  to that effect from  the BUYER . Such  
-deliveries  will be agreed upon well  in advance  and paid for as may  be mutually  agreed.  
- 
-ARTICLE 1 5 
-LIQUID ATED DAMAGES    
-15.1 In the event of the SELLER ‟s failure to submit the Bonds, Guarantees and 
-Documents, supply the stores/ goods, perform services, conduct trials, installation of 
-equipment, training and MET as per schedule specified in this Contract , the BUYER  may, 
-at his discretion withhold any payment until the completion of the Contract . The BUYER  
-may also deduct from the SELLER  as agree d, liquidated damages to the sum of 1/100 of 
-the delay percentage {Delay percentage = (Period of Delay in Delivery in Weeks) x 100 / 
-(Delivery Period in weeks as per Contract )} of the Contract Price of the delayed/ 
-undelivered stores/ services mentioned ab ove for every week of delay or part of a week, 
-subject to the maximum value of the Liquidated Damages being not higher than 10% of the 
-Contract  price of the value of delayed stores/ services (Any extension given by the BUYER  
-for delay attributable to BUYER  or Force Majeure  Clause to be factored in delivery 
-period) . 
- 
-15.2 In case the delay in delivery is attributed to the non -receipt of BFE as per  mutually 
-agreed  schedule, the delivery period shal l be extended accordingly without imposition  of 
-Liquidated  Dam ages. 
- 
-15.3 LD for AMC/CMC /PBL (where  applicable , to be as per RFP ). 
- 
-ARTICLE 16  
-DENIAL CLAUSE  
- 
-16.1 In case the delay in delivery is attributable to the SELLER  or a non -force majeure event, 
-the BUYER  may protect himself against extra expenditure during t he extended period by 
-stipulating a denial clause (over and above levy of LD) in the letter informing the supplier of 
-extension of the delivery period. Any increase in statutory duties and/or upward rise in prices 
-due to the Price Variation Clause (PVC) an d/or any adverse fluctuation in foreign exchange 
-are to be borne by the SELLER  during the extended delivery period, while the BUYER  
-reserves his right to get any benefit of a downward revisions in statutory duties, PVC and 
-foreign exchange rate. Thus, PVC,  other variations and foreign exchange clauses operate only 
-during the original delivery period.  
- 
- 
-ARTICLE 1 7 
-JOINT  RECEIPT  INSPECTION (JRI) IN INDIA   
- 
-17.1 The Parties  agree  that the Joint  Receipt  Inspection  (JRI)  of delivered  goods  shall  be 
-undertaken  on arrival  in India  at location  to be nominated  by BUYER . JRI shall  be 
-completed  within  120 _____ days (for armament/ammunition)/ 30_____ days (for other than 
-armament/ammunition) of arrival of goods at Port Consignee. JRI will consist of: -
+Fossil fuels include coal, oil and natural gas. Burning fossil fuels causes what is known as the “greenhouse effect” in Earth’s atmosphere. The greenhouse effect happens when the sun’s rays penetrate the atmosphere, and the Earth’s surface reflects that heat. Some of the gasses in the atmosphere then trap heat over Earth. Gasses emitted by the burning of fossil fuels are very good at trapping heat and preventing it from leaving the atmosphere. These greenhouse gasses are carbon dioxide, methane, nitrous oxide, chlorofluorocarbons and water vapor. The excess heat in the atmosphere has caused the planet’s average global temperature to rise over time, otherwise known as global warming.
+
+The Industrial Revolution, beginning in the mid-18th century, led to the start of an anthropogenic (human-caused) rise in greenhouse gas emissions from Europe and the United States. The invention of the coal-fired steam engine introduced coal as a major source of energy. Soon it was heating homes and fueling machines in factories.
+
+Since that time, the burning of fossil fuels has steadily increased. Today, many countries around the world use fossil fuels to generate energy for electricity, heat and transportation. Emissions of greenhouse gasses have skyrocketed in the last 100 years, and especially since the 1980s. This has accelerated the rise in Earth’s temperature.
+
+Global warming has presented humans with another issue: climate change. People often use the terms “global warming” and “climate change” interchangeably, but they are different. Global warming refers to Earth’s rising average temperature, while climate change refers to changes in weather patterns and growing seasons around the world. Global warming causes climate change, which poses a serious threat to life on Earth.
+
+Humans are feeling the impact of global warming around the world as climate change brings intense droughts, wildfires and extreme storms with heavier rainfall. Higher temperatures are altering ecosystems, forcing animals to migrate to cooler places to survive. Scientists predict that, if nothing is done to lower global temperatures, many species will go extinct.
+
+The ocean is also warming, and glaciers, ice caps and ice sheets are melting. This is causing sea levels to rise, creating flooding problems for many people who live on islands and in coastal communities.
+
+Corals have been a symbol of the consequences of a warmer ocean. Many coral reefs—home to thousands of species of fish and other organisms—are dying. National Geographic Explorer Shireen Rahimi is an underwater storyteller who focuses her lens on the impact of global warming on tropical coral reefs. Her images capture humans’ relationships to the changing seas in the South Pacific, the Coral Triangle, and the Caribbean. Rahimi is dedicated to telling personal stories that encourage environmental action.
+
+Countries around the world are trying to lower greenhouse gas emissions to slow global warming. In 2015, nearly 200 countries signed the Paris Agreement at a United Nations Climate Change conference. The international treaty tasks each country with lowering greenhouse gas emissions. The goal is to slow the pace of global warming and prevent Earth’s temperature from rising 2°C (3.6°F) above pre-industrial temperatures.

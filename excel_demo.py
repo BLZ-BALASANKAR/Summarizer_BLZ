@@ -217,7 +217,7 @@ def load_config():
         with open("config.yaml", "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     except Exception as e:
-        print(f"{Fore.RED}Error: Could not load config.yaml → {e}{Style.RESET_ALL}")
+        print(f"{Fore.RED}Error: Could not load config.yaml -> {e}{Style.RESET_ALL}")
         sys.exit(1)
 
 def print_banner():
@@ -269,9 +269,9 @@ def main():
 
     print(f"\n{Fore.YELLOW} Sample Text Statistics:{Style.RESET_ALL}")
     words = text.split()
-    print(f"  • Words: {len(words)}")
-    print(f"  • Characters: {len(text)}")
-    print(f"  • Sentences: ~{text.count('.')}\n")
+    print(f"  - Words: {len(words)}")
+    print(f"  - Characters: {len(text)}")
+    print(f"  - Sentences: ~{text.count('.')}\n")
 
     print(f"{Fore.GREEN}  Initializing Summarization Accelerator...{Style.RESET_ALL}")
     accelerator = SummarizationAccelerator(use_gpu=False)
@@ -301,6 +301,10 @@ def main():
     technologies power modern applications while raising important ethical considerations."""
 
     evaluation = accelerator.evaluate_results(results, reference_summary=reference_summary)
+
+    # Merge evaluation into results and save to JSON for the frontend
+    results['evaluation'] = evaluation
+    accelerator.save_results(results, "results.json")
 
     accelerator.print_evaluation_report(evaluation, verbose=False)
 
@@ -349,15 +353,15 @@ def main():
     print(f"     - Side-by-side comparison of all methods")
     print(f"     - Easy sorting and filtering")
 
-    print(f"\n  ℹ  {Fore.CYAN}Sheet 4:{Style.RESET_ALL} Metadata & Statistics")
+    print(f"\n  [i]  {Fore.CYAN}Sheet 4:{Style.RESET_ALL} Metadata & Statistics")
     print(f"     - Execution times, model counts, timestamps")
     print(f"     - Original text information")
 
     print(f"\n{Fore.GREEN} Pro Tip:{Style.RESET_ALL} Open the file in Excel to:")
-    print(f"   • Sort by any metric (ROUGE, BLEU, time, etc.)")
-    print(f"   • Filter to see only extractive or abstractive")
-    print(f"   • Create charts comparing different methods")
-    print(f"   • Find the best summarizer for your use case\n")
+    print(f"   - Sort by any metric (ROUGE, BLEU, time, etc.)")
+    print(f"   - Filter to see only extractive or abstractive")
+    print(f"   - Create charts comparing different methods")
+    print(f"   - Find the best summarizer for your use case\n")
 
     accelerator.cleanup()
 

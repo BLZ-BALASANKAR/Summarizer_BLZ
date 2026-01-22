@@ -1,816 +1,460 @@
-# """
-# app.py
-# Streamlit app to generate configuration YAML for document summarization.
-# """
-
-
-# import streamlit as st
-# import yaml
-# from pathlib import Path
-# import os
-
-# # Page configuration
-# st.set_page_config(
-#     page_title="Config Generator",
-#     layout="centered",
-#     initial_sidebar_state="collapsed"
-# )
-
-# # Professional styling
-# st.markdown("""
-#     <style>
-#     .main {
-#         background-color: #f8f9fa;
-#     }
-#     .stApp {
-#         max-width: 900px;
-#         margin: 0 auto;
-#     }
-#     h1 {
-#         color: #1a1a1a;
-#         font-weight: 600;
-#         padding-bottom: 1rem;
-#         border-bottom: 3px solid #2563eb;
-#     }
-#     h2 {
-#         color: #2563eb;
-#         font-size: 1.3rem;
-#         font-weight: 600;
-#         margin-top: 2rem;
-#         margin-bottom: 1rem;
-#     }
-#     h3 {
-#         color: #475569;
-#         font-size: 1.1rem;
-#         font-weight: 500;
-#         margin-top: 1.5rem;
-#     }
-#     .stButton>button {
-#         background-color: #2563eb;
-#         color: white;
-#         border: none;
-#         padding: 0.5rem 2rem;
-#         font-weight: 500;
-#         border-radius: 6px;
-#         width: 100%;
-#     }
-#     .stButton>button:hover {
-#         background-color: #1d4ed8;
-#     }
-#     .stDownloadButton>button {
-#         background-color: #059669;
-#         color: white;
-#         border: none;
-#         padding: 0.5rem 2rem;
-#         font-weight: 500;
-#         border-radius: 6px;
-#         width: 100%;
-#     }
-#     .stDownloadButton>button:hover {
-#         background-color: #047857;
-#     }
-#     </style>
-# """, unsafe_allow_html=True)
-
-# # Title
-# st.title("Summarization Configuration Generator")
-
-# # PATHS SECTION
-# st.markdown("## 1. File Paths")
-
-# uploaded_file = st.file_uploader("Upload your file", type=["pdf", "docx", "txt"])
-
-# input_path = None
-
-# if uploaded_file is not None:
-#     # Create a full path inside a temporary folder
-#     temp_path = f"./uploaded_{uploaded_file.name}"
-
-#     # Save the file to disk
-#     with open(temp_path, "wb") as f:
-#         f.write(uploaded_file.getbuffer())
-
-#     input_path = os.path.abspath(temp_path)
-
-#     st.success(f"Full path: {input_path}")
-
-# st.markdown("### Output Settings")
-# output_text = st.text_input(
-#     "Output Text Filename",
-#     value="converted.txt",
-#     help="Name for the converted text file"
-# )
-
-# st.markdown("### API Configuration")
-# api_key = st.text_input(
-#     "API Key",
-#     value="",
-#     type="password",
-#     help="Enter your API key for model access"
-# )
-
-# # EXTRACTIVE SECTION
-# st.markdown("## 2. Extractive Methods")
-
-# st.markdown("### Select Algorithms")
-
-# col1, col2 = st.columns(2)
-
-# with col1:
-#     algo_tfidf = st.checkbox("TF-IDF", value=True)
-#     algo_custom_textrank = st.checkbox("Custom TextRank", value=True)
-#     algo_sumy_textrank = st.checkbox("Sumy TextRank", value=True)
-#     algo_sumy_lexrank = st.checkbox("Sumy LexRank", value=True)
-
-# with col2:
-#     algo_sumy_lsa = st.checkbox("Sumy LSA", value=True)
-#     algo_semantic_textrank = st.checkbox("Semantic TextRank", value=True)
-#     algo_embedding_lexrank = st.checkbox("Embedding LexRank", value=True)
-#     algo_mmr = st.checkbox("MMR", value=True)
-
-# selected_algorithms = []
-# if algo_tfidf: selected_algorithms.append('tfidf')
-# if algo_custom_textrank: selected_algorithms.append('custom_textrank')
-# if algo_sumy_textrank: selected_algorithms.append('sumy_textrank')
-# if algo_sumy_lexrank: selected_algorithms.append('sumy_lexrank')
-# if algo_sumy_lsa: selected_algorithms.append('sumy_lsa')
-# if algo_semantic_textrank: selected_algorithms.append('semantic_textrank')
-# if algo_embedding_lexrank: selected_algorithms.append('embedding_lexrank')
-# if algo_mmr: selected_algorithms.append('mmr')
-
-# # SBERT Settings
-# if algo_semantic_textrank or algo_embedding_lexrank or algo_mmr:
-#     st.markdown("### SBERT Settings")
-    
-#     sbert_model = st.selectbox(
-#         "SBERT Model",
-#         ["all-MiniLM-L6-v2", "all-mpnet-base-v2", "paraphrase-MiniLM-L6-v2"],
-#         index=0
-#     )
-    
-#     col1, col2 = st.columns(2)
-#     with col1:
-#         similarity_threshold = st.slider("Similarity Threshold", 0.0, 1.0, 0.0, 0.1)
-#     with col2:
-#         top_k_enabled = st.checkbox("Limit Neighbors", value=False)
-#         top_k = st.number_input("Top K", 1, 50, 10, disabled=not top_k_enabled) if top_k_enabled else None
-
-# # MMR Settings
-# if algo_mmr:
-#     st.markdown("### MMR Settings")
-#     lambda_param = st.slider("Lambda (Relevance vs Diversity)", 0.0, 1.0, 0.7, 0.1)
-
-# # ABSTRACTIVE SECTION
-# st.markdown("## 3. Abstractive Models")
-
-# st.markdown("### Select Models")
-
-# col1, col2 = st.columns(2)
-
-# with col1:
-#     model_bart = st.checkbox("BART Large CNN", value=True)
-#     model_t5 = st.checkbox("T5 Small", value=True)
-#     model_pegasus_xsum = st.checkbox("Pegasus XSum", value=True)
-#     model_flan_t5_base = st.checkbox("Flan-T5 Base", value=True)
-
-# with col2:
-#     model_flan_t5_large = st.checkbox("Flan-T5 Large", value=False)
-#     model_pegasus_large = st.checkbox("Pegasus Large", value=False)
-#     model_bigbird_pegasus = st.checkbox("BigBird Pegasus", value=False)
-#     model_led = st.checkbox("LED (Long Docs)", value=False)
-
-# selected_models = []
-# if model_bart: selected_models.append('bart')
-# if model_t5: selected_models.append('t5')
-# if model_pegasus_xsum: selected_models.append('pegasus_xsum')
-# if model_flan_t5_base: selected_models.append('flan_t5_base')
-# if model_flan_t5_large: selected_models.append('flan_t5_large')
-# if model_pegasus_large: selected_models.append('pegasus_large')
-# if model_bigbird_pegasus: selected_models.append('bigbird_pegasus')
-# if model_led: selected_models.append('led')
-
-# st.markdown("### Generation Parameters")
-
-# col1, col2 = st.columns(2)
-# with col1:
-#     max_length = st.number_input("Max Length", 50, 512, 150, 10)
-# with col2:
-#     min_length = st.number_input("Min Length", 10, 200, 50, 10)
-
-# # LED Settings
-# if model_led:
-#     st.markdown("### LED Specific Settings")
-#     col1, col2 = st.columns(2)
-#     with col1:
-#         led_max_length = st.number_input("LED Max Length", 100, 1024, 256, 16)
-#     with col2:
-#         led_min_length = st.number_input("LED Min Length", 10, 200, 50, 10)
-#     chunk_summary_once = st.checkbox("Chunk Summary Once", value=True)
-
-# # PROCESSING SECTION
-# st.markdown("## 4. Processing Settings")
-
-# col1, col2 = st.columns(2)
-# with col1:
-#     batch_size = st.number_input("Batch Size", 1, 16, 1)
-#     use_gpu = st.checkbox("Use GPU", value=False)
-
-# with col2:
-#     verbose = st.checkbox("Verbose Logging", value=True)
-#     save_temp_excel = st.checkbox("Save Temp on Lock", value=True)
-
-# # OUTPUT SECTION
-# st.markdown("## 5. Output Settings")
-
-# col1, col2 = st.columns(2)
-# with col1:
-#     output_dir = st.text_input("Output Directory", value=".")
-# with col2:
-#     excel_filename = st.text_input("Excel Filename", value="full_summarization_report.xlsx")
-
-# # PERFORMANCE SECTION
-# st.markdown("## 6. Performance Settings")
-
-# max_sentences = st.number_input(
-#     "Max Sentences for Full Embedding",
-#     100, 1000, 400, 50,
-#     help="Documents exceeding this will use chunking for semantic methods"
-# )
-
-# # BUILD CONFIG
-# st.markdown("---")
-
-# # Validation
-# validation_errors = []
-
-# if not input_path or input_path.strip() == "":
-#     validation_errors.append("Input Document Path is required")
-
-# if not output_text or output_text.strip() == "":
-#     validation_errors.append("Output Text Filename is required")
-
-# if not api_key or api_key.strip() == "":
-#     validation_errors.append("API Key is required")
-
-# if len(selected_algorithms) == 0:
-#     validation_errors.append("At least one Extractive Algorithm must be selected")
-
-# if len(selected_models) == 0:
-#     validation_errors.append("At least one Abstractive Model must be selected")
-
-# if not output_dir or output_dir.strip() == "":
-#     validation_errors.append("Output Directory is required")
-
-# if not excel_filename or excel_filename.strip() == "":
-#     validation_errors.append("Excel Filename is required")
-
-# # Show validation errors if any
-# if validation_errors:
-#     st.error("Please complete all required fields:")
-#     for error in validation_errors:
-#         st.write(f"- {error}")
-
-# generate_button_disabled = len(validation_errors) > 0
-
-# if st.button("Generate Configuration", disabled=generate_button_disabled):
-#     config = {
-#         'paths': {
-#             'input_path': input_path,
-#             'output_text': output_text
-#         },
-#          'gemini': {
-#             'enabled': True,             
-#             'api_key': api_key,          
-#         },
-         
-#         'extractive': {
-#             'algorithms': selected_algorithms
-#         },
-#         'abstractive': {
-#             'models': {
-#                 'bart': 'facebook/bart-large-cnn',
-#                 't5': 't5-small',
-#                 'pegasus_xsum': 'google/pegasus-xsum',
-#                 'flan_t5_base': 'google/flan-t5-base',
-#                 'flan_t5_large': 'google/flan-t5-large',
-#                 'pegasus_large': 'google/pegasus-large',
-#                 'bigbird_pegasus': 'google/bigbird-pegasus-large-arxiv',
-#                 'led': 'allenai/led-base-16384'
-#             },
-#             'default_to_run': selected_models,
-#             'generation': {
-#                 'max_length': max_length,
-#                 'min_length': min_length
-#             }
-#         },
-#         'processing': {
-#             'batch_size': batch_size,
-#             'use_gpu': use_gpu,
-#             'verbose': verbose,
-#             'save_temp_excel_on_lock': save_temp_excel
-#         },
-#         'output': {
-#             'dir': output_dir,
-#             'excel_filename': excel_filename
-#         },
-#         'performance': {
-#             'max_sentences_for_full_embedding': max_sentences,
-#             'notes': f"If a document has more than {max_sentences} sentences:\n- SBERT-based models become slow (O(n²) similarity matrix)\n- Accelerator should chunk or skip heavy semantic methods"
-#         }
-#     }
-    
-#     # Add SBERT config if needed
-#     if algo_semantic_textrank or algo_embedding_lexrank or algo_mmr:
-#         config['extractive']['sbert'] = {
-#             'model': sbert_model,
-#             'similarity_threshold': similarity_threshold,
-#             'top_k': top_k
-#         }
-    
-#     # Add MMR config if needed
-#     if algo_mmr:
-#         config['extractive']['mmr'] = {
-#             'lambda_param': lambda_param
-#         }
-    
-#     # Add LED config if needed
-#     if model_led:
-#         config['abstractive']['led'] = {
-#             'max_length': led_max_length,
-#             'min_length': led_min_length,
-#             'chunk_summary_once': chunk_summary_once
-#         }
-    
-#     yaml_content = yaml.dump(config, default_flow_style=False, sort_keys=False)
-    
-#     # Create configs directory if it doesn't exist
-#     configs_dir = Path("configs")
-#     configs_dir.mkdir(exist_ok=True)
-    
-#     # Save to configs/config.yaml
-#     config_path =  "config.yaml"
-    
-#     try:
-#         with open(config_path, 'w') as f:
-#             f.write(yaml_content)
-        
-#         st.success(f"Configuration saved successfully to: {config_path}")
-        
-#         st.code(yaml_content, language='yaml')
-        
-#     except Exception as e:
-#         st.error(f"Error saving configuration: {str(e)}")
-
-
-
-
-
-
-
 """
 app.py
-Streamlit app to generate configuration YAML for document summarization.
+Summarization Accelerator - Enterprise Dashboard
+Streamlit-based frontend integrating unified Pipeline.
 """
 
 import streamlit as st
 import yaml
-from pathlib import Path
 import os
-import subprocess  
-import pandas as pd  
-import sys
+import time
+import pandas as pd
+import json
+from pathlib import Path
 
+# Download NLTK data (required for Streamlit Cloud)
+import nltk
 
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt", quiet=True)
+    nltk.download("punkt_tab", quiet=True)
+    nltk.download("averaged_perceptron_tagger", quiet=True)
+    nltk.download("wordnet", quiet=True)
 
-# Page configuration
+# Import Enterprise Modules
+from src.core.pipeline import SummarizationPipeline
+from src.utils.config_loader import ConfigLoader
+from src.utils.logger import setup_logger
+
+logger = setup_logger("App")
+
+# Page Config
 st.set_page_config(
-    page_title="Config Generator",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    page_title="Summarization Accelerator (Enterprise)",
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
-# Professional styling
-st.markdown("""
+# Styling
+st.markdown(
+    """
     <style>
-    .main {
-        background-color: #f8f9fa;
-    }
-    .stApp {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    h1 {
-        color: #1a1a1a;
-        font-weight: 600;
-        padding-bottom: 1rem;
-        border-bottom: 3px solid #2563eb;
-    }
-    h2 {
-        color: #2563eb;
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-    }
-    h3 {
-        color: #475569;
-        font-size: 1.1rem;
-        font-weight: 500;
-        margin-top: 1.5rem;
-    }
-    .stButton>button {
-        background-color: #2563eb;
-        color: white;
-        border: none;
-        padding: 0.5rem 2rem;
-        font-weight: 500;
-        border-radius: 6px;
-        width: 100%;
-    }
-    .stButton>button:hover {
-        background-color: #1d4ed8;
-    }
-    .stDownloadButton>button {
-        background-color: #059669;
-        color: white;
-        border: none;
-        padding: 0.5rem 2rem;
-        font-weight: 500;
-        border-radius: 6px;
-        width: 100%;
-    }
-    .stDownloadButton>button:hover {
-        background-color: #047857;
-    }
+    .main {background-color: #f8f9fa;}
+    .stApp {max-width: 1400px; margin: 0 auto;}
+    h1 {color: #1a1a1a; border-bottom: 3px solid #2563eb; padding-bottom: 1rem;}
+    .stButton>button {background-color: #2563eb; color: white; width: 100%;}
+    .stButton>button:hover {background-color: #1d4ed8;}
     </style>
-""", unsafe_allow_html=True)
-
-# Title
-st.title("Summarization Configuration Generator")
-
-# PATHS SECTION
-st.markdown("## 1. File Paths")
-
-uploaded_file = st.file_uploader("Upload your file", type=["pdf", "docx", "txt"])
-
-input_path = None
-
-if uploaded_file is not None:
-    # Create a full path inside a temporary folder
-    temp_path = f"./uploaded_{uploaded_file.name}"
-
-    # Save the file to disk
-    with open(temp_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-
-    input_path = os.path.abspath(temp_path)
-
-    st.success(f"Full path: {input_path}")
-
-st.markdown("### Output Settings")
-output_text = st.text_input(
-    "Output Text Filename",
-    value="converted.txt",
-    help="Name for the converted text file"
+""",
+    unsafe_allow_html=True,
 )
 
-st.markdown("### API Configuration")
-api_key = st.text_input(
-    "API Key",
-    value="",
-    type="password",
-    help="Enter your API key for model access"
-)
+st.title("Summarization Accelerator")
 
-# EXTRACTIVE SECTION
-st.markdown("## 2. Extractive Methods")
+# Initialize session state
+if "pipeline_run" not in st.session_state:
+    st.session_state.pipeline_run = False
+if "pipeline_timestamp" not in st.session_state:
+    st.session_state.pipeline_timestamp = None
 
-st.markdown("### Select Algorithms")
+# Sidebar
+with st.sidebar:
+    st.header("Configuration")
 
-col1, col2 = st.columns(2)
-
-with col1:
-    algo_tfidf = st.checkbox("TF-IDF", value=True)
-    algo_custom_textrank = st.checkbox("Custom TextRank", value=True)
-    algo_sumy_textrank = st.checkbox("Sumy TextRank", value=True)
-    algo_sumy_lexrank = st.checkbox("Sumy LexRank", value=True)
-
-with col2:
-    algo_sumy_lsa = st.checkbox("Sumy LSA", value=True)
-    algo_semantic_textrank = st.checkbox("Semantic TextRank", value=True)
-    algo_embedding_lexrank = st.checkbox("Embedding LexRank", value=True)
-    algo_mmr = st.checkbox("MMR", value=True)
-
-selected_algorithms = []
-if algo_tfidf: selected_algorithms.append('tfidf')
-if algo_custom_textrank: selected_algorithms.append('custom_textrank')
-if algo_sumy_textrank: selected_algorithms.append('sumy_textrank')
-if algo_sumy_lexrank: selected_algorithms.append('sumy_lexrank')
-if algo_sumy_lsa: selected_algorithms.append('sumy_lsa')
-if algo_semantic_textrank: selected_algorithms.append('semantic_textrank')
-if algo_embedding_lexrank: selected_algorithms.append('embedding_lexrank')
-if algo_mmr: selected_algorithms.append('mmr')
-
-# SBERT Settings
-if algo_semantic_textrank or algo_embedding_lexrank or algo_mmr:
-    st.markdown("### SBERT Settings")
-    
-    sbert_model = st.selectbox(
-        "SBERT Model",
-        ["all-MiniLM-L6-v2", "all-mpnet-base-v2", "paraphrase-MiniLM-L6-v2"],
-        index=0
+    # Input
+    st.subheader("1. Input Document")
+    uploaded_file = st.file_uploader(
+        "Upload (PDF/DOCX/TXT)", type=["pdf", "docx", "txt"]
     )
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        similarity_threshold = st.slider("Similarity Threshold", 0.0, 1.0, 0.0, 0.1)
-    with col2:
-        top_k_enabled = st.checkbox("Limit Neighbors", value=False)
-        top_k = st.number_input("Top K", 1, 50, 10, disabled=not top_k_enabled) if top_k_enabled else None
+    input_path = None
 
-# MMR Settings
-if algo_mmr:
-    st.markdown("### MMR Settings")
-    lambda_param = st.slider("Lambda (Relevance vs Diversity)", 0.0, 1.0, 0.7, 0.1)
+    if uploaded_file:
+        # Save to temp
+        temp_dir = Path("temp_uploads")
+        temp_dir.mkdir(exist_ok=True)
+        input_path = temp_dir / uploaded_file.name
+        with open(input_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.success(f"Loaded: {uploaded_file.name}")
 
-# ABSTRACTIVE SECTION
-st.markdown("## 3. Abstractive Models")
+    # AI Config
+    st.subheader("2. AI Settings")
+    api_key = st.text_input("Gemini API Key", type="password")
 
-st.markdown("### Select Models")
+    styles = [
+        "Standard",
+        "Formal",
+        "Casual",
+        "Bullet Points",
+        "ELI5",
+        "Executive Summary",
+    ]
+    style = st.selectbox("Tone / Style", styles)
 
-col1, col2 = st.columns(2)
+    # Model Config (simplified for UI)
+    st.subheader("3. Models")
+    run_extract = st.checkbox("Run Extractive Models", value=True)
+    run_abstract = st.checkbox("Run Abstractive Models", value=True)
 
-with col1:
-    model_bart = st.checkbox("BART Large CNN", value=True)
-    model_t5 = st.checkbox("T5 Small", value=True)
-    model_pegasus_xsum = st.checkbox("Pegasus XSum", value=True)
-    model_flan_t5_base = st.checkbox("Flan-T5 Base", value=True)
+    # Run Button
+    start_btn = st.button("RUN PIPELINE", type="primary")
 
-with col2:
-    model_flan_t5_large = st.checkbox("Flan-T5 Large", value=False)
-    model_pegasus_large = st.checkbox("Pegasus Large", value=False)
-    model_bigbird_pegasus = st.checkbox("BigBird Pegasus", value=False)
-    model_led = st.checkbox("LED (Long Docs)", value=False)
+# Main Area
+if start_btn:
+    if not input_path:
+        st.error("Please upload a document first.")
+    elif not api_key:
+        st.error("Gemini API Key is required.")
+    else:
+        # Build Config Dictionary in-memory
+        config = {
+            "paths": {
+                "input_path": str(input_path.resolve()),
+                "output_text": str((Path("temp_uploads") / "converted.txt").resolve()),
+            },
+            "gemini": {"enabled": True, "api_key": api_key, "style": style},
+            "extractive": {
+                "algorithms": ["tfidf", "sumy_textrank", "sumy_lexrank"]
+                if run_extract
+                else []
+            },
+            "abstractive": {
+                "default_to_run": ["bart", "t5", "flan_t5_base"]
+                if run_abstract
+                else [],
+                "generation": {"max_length": 150, "min_length": 50},
+            },
+            "processing": {"use_gpu": False},
+            "output": {"excel_filename": "full_summarization_report.xlsx"},
+        }
 
-selected_models = []
-if model_bart: selected_models.append('bart')
-if model_t5: selected_models.append('t5')
-if model_pegasus_xsum: selected_models.append('pegasus_xsum')
-if model_flan_t5_base: selected_models.append('flan_t5_base')
-if model_flan_t5_large: selected_models.append('flan_t5_large')
-if model_pegasus_large: selected_models.append('pegasus_large')
-if model_bigbird_pegasus: selected_models.append('bigbird_pegasus')
-if model_led: selected_models.append('led')
+        # Save config for persistence/debug
+        with open("config.yaml", "w", encoding="utf-8") as f:
+            yaml.dump(config, f)
 
-st.markdown("### Generation Parameters")
+        # Initialize Pipeline
+        pipeline = SummarizationPipeline(config)
 
-col1, col2 = st.columns(2)
-with col1:
-    max_length = st.number_input("Max Length", 50, 512, 150, 10)
-with col2:
-    min_length = st.number_input("Min Length", 10, 200, 50, 10)
+        # Progress UI
+        progress_bar = st.progress(0, text="Initializing...")
+        status_area = st.empty()
 
-# LED Settings
-if model_led:
-    st.markdown("### LED Specific Settings")
-    col1, col2 = st.columns(2)
-    with col1:
-        led_max_length = st.number_input("LED Max Length", 100, 1024, 256, 16)
-    with col2:
-        led_min_length = st.number_input("LED Min Length", 10, 200, 50, 10)
-    chunk_summary_once = st.checkbox("Chunk Summary Once", value=True)
+        try:
+            # Run Generator
+            final_results = {}
+            for status, prog in pipeline.run():
+                progress_bar.progress(prog, text=status)
+                time.sleep(0.1)  # UI smoothness
 
-# PROCESSING SECTION
-st.markdown("## 4. Processing Settings")
+            st.success("Analysis Complete!")
+            # Mark pipeline as run in this session
+            st.session_state.pipeline_run = True
+            st.session_state.pipeline_timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            # Trigger refresh to load tabs
+            time.sleep(1)
+            st.rerun()
 
-col1, col2 = st.columns(2)
-with col1:
-    batch_size = st.number_input("Batch Size", 1, 16, 1)
-    use_gpu = st.checkbox("Use GPU", value=False)
+        except Exception as e:
+            st.error(f"Pipeline Failed: {e}")
+            logger.error(f"UI Error: {e}")
 
-with col2:
-    verbose = st.checkbox("Verbose Logging", value=True)
-    save_temp_excel = st.checkbox("Save Temp on Lock", value=True)
-
-# OUTPUT SECTION
-st.markdown("## 5. Output Settings")
-
-col1, col2 = st.columns(2)
-with col1:
-    output_dir = st.text_input("Output Directory", value=".")
-with col2:
-    excel_filename = st.text_input("Excel Filename", value="full_summarization_report.xlsx")
-
-# PERFORMANCE SECTION
-st.markdown("## 6. Performance Settings")
-
-max_sentences = st.number_input(
-    "Max Sentences for Full Embedding",
-    100, 1000, 400, 50,
-    help="Documents exceeding this will use chunking for semantic methods"
-)
-
-# BUILD CONFIG
+# Visualization Tabs
 st.markdown("---")
 
-# Validation
-validation_errors = []
-
-if not input_path or input_path.strip() == "":
-    validation_errors.append("Input Document Path is required")
-
-if not output_text or output_text.strip() == "":
-    validation_errors.append("Output Text Filename is required")
-
-if not api_key or api_key.strip() == "":
-    validation_errors.append("API Key is required")
-
-if len(selected_algorithms) == 0:
-    validation_errors.append("At least one Extractive Algorithm must be selected")
-
-if len(selected_models) == 0:
-    validation_errors.append("At least one Abstractive Model must be selected")
-
-if not output_dir or output_dir.strip() == "":
-    validation_errors.append("Output Directory is required")
-
-if not excel_filename or excel_filename.strip() == "":
-    validation_errors.append("Excel Filename is required")
-
-# Show validation errors if any
-if validation_errors:
-    st.error("Please complete all required fields:")
-    for error in validation_errors:
-        st.write(f"- {error}")
-
-generate_button_disabled = len(validation_errors) > 0
-
-if st.button("Generate Configuration", disabled=generate_button_disabled):
-    config = {
-        'paths': {
-            'input_path': input_path,
-            'output_text': output_text
-        },
-        'gemini': {
-            'enabled': True,
-            'api_key': api_key,
-        },
-        'extractive': {
-            'algorithms': selected_algorithms
-        },
-        'abstractive': {
-            'models': {
-                'bart': 'facebook/bart-large-cnn',
-                't5': 't5-small',
-                'pegasus_xsum': 'google/pegasus-xsum',
-                'flan_t5_base': 'google/flan-t5-base',
-                'flan_t5_large': 'google/flan-t5-large',
-                'pegasus_large': 'google/pegasus-large',
-                'bigbird_pegasus': 'google/bigbird-pegasus-large-arxiv',
-                'led': 'allenai/led-base-16384'
-            },
-            'default_to_run': selected_models,
-            'generation': {
-                'max_length': max_length,
-                'min_length': min_length
-            }
-        },
-        'processing': {
-            'batch_size': batch_size,
-            'use_gpu': use_gpu,
-            'verbose': verbose,
-            'save_temp_excel_on_lock': save_temp_excel
-        },
-        'output': {
-            'dir': output_dir,
-            'excel_filename': excel_filename
-        },
-        'performance': {
-            'max_sentences_for_full_embedding': max_sentences,
-            'notes': f"If a document has more than {max_sentences} sentences:\n"
-                     f"- SBERT-based models become slow (O(n²) similarity matrix)\n"
-                     f"- Accelerator should chunk or skip heavy semantic methods"
-        }
-    }
-    
-    # Add SBERT config if needed
-    if algo_semantic_textrank or algo_embedding_lexrank or algo_mmr:
-        config['extractive']['sbert'] = {
-            'model': sbert_model,
-            'similarity_threshold': similarity_threshold,
-            'top_k': top_k
-        }
-    
-    # Add MMR config if needed
-    if algo_mmr:
-        config['extractive']['mmr'] = {
-            'lambda_param': lambda_param
-        }
-    
-    # Add LED config if needed
-    if model_led:
-        config['abstractive']['led'] = {
-            'max_length': led_max_length,
-            'min_length': led_min_length,
-            'chunk_summary_once': chunk_summary_once
-        }
-    
-    yaml_content = yaml.dump(config, default_flow_style=False, sort_keys=False)
-    
-    config_path = "config.yaml"
-    
-    try:
-        with open(config_path, 'w', encoding="utf-8") as f:
-            f.write(yaml_content)
-        
-        st.success(f"Configuration saved successfully to: {config_path}")
-        st.code(yaml_content, language='yaml')
-        
-    except Exception as e:
-        st.error(f"Error saving configuration: {str(e)}")
-
-
-# =========================================================
-# 7. Run Pipeline and Show Results
-# =========================================================
-
-# 7. Run Pipeline and View Results
-st.markdown("## 7. Run Pipeline and View Results")
-st.markdown(
-    "This will run `run_pipeline.py` using the generated `config.yaml` and then display:\n"
-    "- The generated Excel report (latest full_summarization_report*.xlsx)\n"
-    "- The Gemini inference from `inference.txt`"
-)
-
-BASE_DIR = Path(__file__).resolve().parent  # project root (where run_pipeline.py lives)
-
-if st.button("Run Full Pipeline"):
-    with st.spinner("Running full pipeline (doc_to_txt → excel_demo → gemini_analysis)..."):
-        # Use the same Python interpreter that Streamlit is using
-        result = subprocess.run(
-            [sys.executable, "run_pipeline.py"],
-            cwd=BASE_DIR,              # IMPORTANT: run from project root
-            capture_output=True,
-            text=True
-        )
-
-    st.success("Pipeline finished. See logs below.")
-
-    # Show stdout
-    if result.stdout:
-        st.markdown("### Pipeline Output (stdout)")
-        st.code(result.stdout)
-    else:
-        st.markdown("### Pipeline Output (stdout)")
-        st.write("(no stdout)")
-
-    # Show stderr
-    if result.stderr:
-        st.markdown("### Pipeline Errors/Warnings (stderr)")
-        st.code(result.stderr)
-
-    # === Show Excel report ===
-    st.markdown("### Generated Excel Report")
-
-    # Find the latest full_summarization_report*.xlsx under BASE_DIR
-    excel_files = sorted(
-        BASE_DIR.glob("full_summarization_report*.xlsx"),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True
+# Only show results if pipeline has been run in this session
+if st.session_state.pipeline_run:
+    st.caption(f"Results generated at: {st.session_state.pipeline_timestamp}")
+    tabs = st.tabs(
+        ["Stylized Summary", "Metrics & Report", "Traceability", "AI Insight"]
     )
+else:
+    st.info("👆 Please upload a document and run the pipeline to see results.")
+    tabs = None
 
-    if excel_files:
-        latest_excel = excel_files[0]
-        st.write(f"Using file: `{latest_excel.name}`")
+# Tab 1: Stylized
+if tabs:
+    with tabs[0]:
+        st.subheader(" Stylized Summaries")
+        st.write("The same summary, rewritten in different tones by AI:")
 
-        try:
-            import pandas as pd
+        # Try loading multiple versions first
+        if Path("stylized_summaries.json").exists():
+            try:
+                with open("stylized_summaries.json", "r", encoding="utf-8") as f:
+                    stylized_versions = json.load(f)
 
-            df_excel = pd.read_excel(latest_excel, sheet_name="All Results")
-            st.dataframe(df_excel)
-        except Exception as e:
-            st.error(f"Could not read Excel file: {e}")
-    else:
-        st.warning(
-            "No Excel file found matching `full_summarization_report*.xlsx`. "
-            "Check that the pipeline ran without fatal errors."
-        )
+                # Display each style in a card
+                for style_name, summary_text in stylized_versions.items():
+                    # Style-specific colors
+                    style_colors = {
+                        "Formal": "#1e40af",  # Dark blue
+                        "Casual": "#ea580c",  # Orange
+                        "Bullet Points": "#059669",  # Green
+                        "Executive Summary": "#7c3aed",  # Purple
+                        "ELI5": "#dc2626",  # Red
+                    }
+                    border_color = style_colors.get(style_name, "#2563eb")
 
-    # === Show inference.txt (Gemini output) ===
-    st.markdown("### Gemini Inference (inference.txt)")
-    inference_path = BASE_DIR / "inference.txt"
+                    with st.expander(
+                        f" {style_name}", expanded=(style_name == "Executive Summary")
+                    ):
+                        st.markdown(
+                            f'<div style="padding:15px; background:#f8fafc; border-left:5px solid {border_color}; border-radius:5px;">{summary_text}</div>',
+                            unsafe_allow_html=True,
+                        )
 
-    if inference_path.exists():
-        try:
-            with inference_path.open("r", encoding="utf-8") as f:
-                content = f.read()
-            st.text_area("inference.txt", content, height=300)
-        except Exception as e:
-            st.error(f"Error reading inference.txt: {e}")
-    else:
-        st.warning(
-            "`inference.txt` not found in project root.\n\n"
-            "Make sure:\n"
-            "- `gemini.enabled` is `true` in config.yaml\n"
-            "- The pipeline completed Gemini analysis (see stdout above)"
-        )
+            except Exception as e:
+                st.error(f"Error loading stylized versions: {e}")
+                # Fallback to single version
+                if Path("stylized_summary.txt").exists():
+                    with open("stylized_summary.txt", "r", encoding="utf-8") as f:
+                        st.markdown(
+                            f'<div style="padding:15px; background:#fff; border-left:5px solid #2563eb;">{f.read()}</div>',
+                            unsafe_allow_html=True,
+                        )
+        elif Path("stylized_summary.txt").exists():
+            # Fallback for old single-version format
+            with open("stylized_summary.txt", "r", encoding="utf-8") as f:
+                st.markdown(
+                    f'<div style="padding:15px; background:#fff; border-left:5px solid #2563eb;">{f.read()}</div>',
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.info("Run pipeline to see results.")
+
+    # Tab 2: Report
+    with tabs[1]:
+        df = pd.DataFrame()
+        if Path("full_summarization_report.xlsx").exists():
+            try:
+                df = pd.read_excel(
+                    "full_summarization_report.xlsx", sheet_name="All Results"
+                )
+            except Exception as e:
+                st.error(f"Error reading Excel file: {e}")
+                df = pd.DataFrame()
+
+        if not df.empty:
+            # --- NEW: Integrated Insights ---
+            st.subheader(" Smart Analysis & Recommendations")
+
+            # Metrics Reference Table
+            with st.expander(" Metrics Glossary - What do these numbers mean?"):
+                st.markdown("""
+                ### Quality Metrics (Higher is Better)
+                
+                | Metric | Range | What it Measures | Interpretation |
+                |--------|-------|------------------|----------------|
+                | **ROUGE-1 F1** | 0-100% | Unigram (single word) overlap with original | **60-80%**: Good content preservation<br>**>80%**: Excellent coverage<br>**<60%**: Significant information loss |
+                | **ROUGE-2 F1** | 0-100% | Bigram (2-word phrase) overlap | Measures phrase-level accuracy |
+                | **ROUGE-L F1** | 0-100% | Longest common subsequence | Evaluates sentence structure preservation |
+                | **BLEU Score** | 0-100% | N-gram precision across all levels | Overall quality match with original |
+                | **METEOR** | 0-100% | Advanced matching with synonyms | More nuanced quality (considers paraphrasing) |
+                | **Cosine Similarity** | 0-100% | Semantic similarity (meaning-based) | **>70%**: Preserves core meaning<br>**50-70%**: Partial similarity<br>**<50%**: Significant drift |
+                | **Density %** | 0-100% | Vocabulary richness (unique words / total words) | **60-85%**: Well-balanced<br>**>85%**: Very information-dense<br>**<60%**: Repetitive |
+                
+                ### Efficiency Metrics (Context-Dependent)
+                
+                | Metric | Range | What it Measures | Interpretation |
+                |--------|-------|------------------|----------------|
+                | **Compression %** | 0-100% | Summary size relative to original | **15-25%**: Highly concise<br>**25-40%**: Moderate compression<br>**>40%**: Minimal compression |
+                | **Time (s)** | 0-∞ | Processing speed | **<1s**: Instant (extractive)<br>**1-10s**: Fast (small abstractive models)<br>**>10s**: Slow (large models or long docs) |
+                
+                ### Quick Decision Guide
+                - **For Legal/Medical**: Prioritize high **ROUGE-1** (>75%) and **Cosine Sim** (>80%)
+                - **For Social Media**: Low **Compression** (<20%) and high **Density** (>70%)
+                - **For Real-Time Apps**: **Time** <1s, acceptable **ROUGE** >60%
+                - **For Reports**: Balance **ROUGE** >70% with **Density** >65%
+                """)
+
+            # Detect the model/method identifier column
+            model_col = None
+            for col_name in ["Method/Model", "Model", "Method", "Algorithm"]:
+                if col_name in df.columns:
+                    model_col = col_name
+                    break
+
+            # Helper to safely get best row
+            def get_best_row(df, col, method="max"):
+                if col not in df.columns:
+                    return None
+                # Force numeric, turning errors to NaN
+                s = pd.to_numeric(df[col], errors="coerce")
+                s = s.dropna()
+                if s.empty:
+                    return None
+
+                idx = s.idxmax() if method == "max" else s.idxmin()
+                return df.loc[idx]
+
+            found_rec = False
+
+            # 1. Accuracy (ROUGE)
+            best_rouge = get_best_row(df, "ROUGE-1 F1", "max")
+            if best_rouge is not None and model_col:
+                found_rec = True
+                st.success(f"""
+                ###  Best for Accuracy & Detail: **{best_rouge[model_col]}**
+                *   **Why?** It achieved the highest **ROUGE score** ({best_rouge['ROUGE-1 F1']:.2f}).
+                *   **What this means:** This model captured the most keywords and phrases from your original text.
+                *   **Use this when:** You need a high-quality summary that doesn't miss important facts.
+                """)
+
+            # 2. Brevity (Compression)
+            concise = get_best_row(df, "Compression %", "max")
+            if concise is not None and model_col:
+                found_rec = True
+                st.warning(f"""
+                ###  Best for Quick Reading: **{concise[model_col]}**
+                *   **Why?** It compressed the text by **{concise['Compression %']:.1f}%**.
+                *   **What this means:** It produced the shortest summary relative to the original.
+                *   **Use this when:** You want a tweet-style summary or have limited screen space.
+                """)
+
+            # 3. Speed (Time)
+            fastest = get_best_row(df, "Time (s)", "min")
+            if fastest is not None and model_col:
+                found_rec = True
+                st.info(f"""
+                ###  Best for Real-Time Speed: **{fastest[model_col]}**
+                *   **Why?** It finished in just **{fastest['Time (s)']:.3f} seconds**.
+                *   **What this means:** It works almost instantly.
+                *   **Use this when:** You need to summarize thousands of documents in a batch process.
+                """)
+
+            if not found_rec:
+                st.write("Run the pipeline to see smart recommendations here.")
+
+            st.divider()
+            st.subheader("Detailed Comparison Table")
+
+            # Gradient styling on available columns
+            cols = [
+                c
+                for c in [
+                    "Compression %",
+                    "Density %",
+                    "Cosine Sim",
+                    "ROUGE-1 F1",
+                    "ROUGE-2 F1",
+                    "ROUGE-L F1",
+                    "BLEU Score",
+                    "METEOR",
+                ]
+                if c in df.columns
+            ]
+            # Ensure numeric for gradient
+            for c in cols:
+                df[c] = pd.to_numeric(df[c], errors="coerce")
+
+            st.dataframe(
+                df.style.background_gradient(subset=cols, cmap="Greens"),
+                use_container_width=True,
+            )
+
+            with open("full_summarization_report.xlsx", "rb") as f:
+                st.download_button(
+                    "Download Excel Report", f, file_name="summarization_report_v1.xlsx"
+                )
+        else:
+            st.info("No report data found. Please run the pipeline first.")
+
+    # Tab 3: Traceability
+    with tabs[2]:
+        st.subheader(" Source Traceability")
+        st.write("See exactly which source sentences each summary line came from.")
+
+        if Path("results.json").exists():
+            with open("results.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            # Collect all available mappings
+            all_mappings = {}
+
+            # Extractive mappings
+            evals_ext = data.get("evaluation", {}).get("extractive", {})
+            for algo, metrics in evals_ext.items():
+                if "source_mapping" in metrics and metrics["source_mapping"]:
+                    all_mappings[f"Extractive: {algo}"] = metrics["source_mapping"]
+
+            # Abstractive mappings
+            evals_abs = data.get("evaluation", {}).get("abstractive", {})
+            for model, metrics in evals_abs.items():
+                if "source_mapping" in metrics and metrics["source_mapping"]:
+                    all_mappings[f"Abstractive: {model}"] = metrics["source_mapping"]
+
+            if all_mappings:
+                # Model selector
+                selected_model = st.selectbox(
+                    "Choose Model to Analyze",
+                    options=list(all_mappings.keys()),
+                    help="Select which summarization model's traceability you want to view",
+                )
+
+                mapping = all_mappings[selected_model]
+
+                # Export button
+                col1, col2 = st.columns([3, 1])
+                with col2:
+                    mapping_csv = "Summary Sentence,Source Sentence,Similarity %,Source Position\n"
+                    for item in mapping:
+                        mapping_csv += f'"{item.get("summary_sent", "")}","{item.get("source_sent", "")}",{item.get("similarity", 0):.1f},{item.get("source_index", 0)}\n'
+
+                    st.download_button(
+                        "📥 Export CSV",
+                        mapping_csv,
+                        file_name=f"traceability_{selected_model.replace(' ', '_').replace(':', '')}.csv",
+                        mime="text/csv",
+                    )
+
+                with col1:
+                    st.caption(f"Found **{len(mapping)}** mapped sentence pairs")
+
+                st.divider()
+
+                # Display mappings with enhanced info
+                for idx, item in enumerate(mapping, 1):
+                    score = item.get("similarity", 0)
+                    source_idx = item.get("source_index", 0)
+
+                    # Color coding
+                    if score > 80:
+                        color = "#dcfce7"
+                        badge = "🟢 High Match"
+                    elif score > 50:
+                        color = "#fef9c3"
+                        badge = "🟡 Moderate"
+                    else:
+                        color = "#fee2e2"
+                        badge = "🔴 Low Match"
+
+                    st.markdown(
+                        f"""
+                    <div style="margin-bottom:15px; padding:12px; background:{color}; border-radius:8px; border-left:4px solid #333;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <b>#{idx} Summary Sentence:</b>
+                            <span style="background:white; padding:4px 8px; border-radius:4px; font-size:12px;">{badge} ({score:.1f}%)</span>
+                        </div>
+                        <div style="margin-bottom:10px; font-size:15px;">"{item['summary_sent']}"</div>
+                        <div style="background:rgba(255,255,255,0.7); padding:8px; border-radius:4px;">
+                            <small style="color:#666;">📄 Source (Position {source_idx}):</small><br>
+                            <i style="color:#444;">"{item['source_sent']}"</i>
+                        </div>
+                    </div>
+                    """,
+                        unsafe_allow_html=True,
+                    )
+            else:
+                st.warning(
+                    "No traceability data found. Run the pipeline to generate mappings."
+                )
+        else:
+            st.info("No results file found. Please run the pipeline first.")
+
+    # Tab 4: AI Insight
+    with tabs[3]:
+        if Path("inference.txt").exists():
+            with open("inference.txt", "r", encoding="utf-8") as f:
+                st.markdown(f.read())

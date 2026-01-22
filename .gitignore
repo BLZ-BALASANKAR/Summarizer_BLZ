@@ -22,6 +22,7 @@ wheels/
 
 # Virtual environments
 venv/
+.venv/
 ENV/
 env/
 
@@ -35,6 +36,24 @@ env/
 models/
 .cache/
 
-# Outputs
+# Outputs (generated at runtime)
 outputs/
 *.log
+converted.txt
+results.json
+inference.txt
+stylized_summary.txt
+stylized_summaries.json
+full_summarization_report.xlsx
+temp_uploads/
+uploaded_*
+
+# Secrets (never commit!)
+.streamlit/secrets.toml
+
+# Config (may contain API keys)
+config.yaml
+
+# Large files
+*.docx
+*.pdf
