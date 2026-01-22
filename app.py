@@ -81,7 +81,19 @@ with st.sidebar:
 
     # AI Config
     st.subheader("2. AI Settings")
-    api_key = st.text_input("Gemini API Key", type="password")
+
+    # Try to load API key from secrets first (for cloud deployment)
+    api_key = ""
+    if "GEMINI_API_KEY" in st.secrets:
+        api_key = st.secrets["GEMINI_API_KEY"]
+        st.success("✓ API Key loaded from secrets")
+    else:
+        # Fallback to manual input for local development
+        api_key = st.text_input(
+            "Gemini API Key",
+            type="password",
+            help="For cloud deployment, add GEMINI_API_KEY to Streamlit Secrets",
+        )
 
     styles = [
         "Standard",
